@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Roadmap to Learning GLSL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The application is designed as a vertical interactive timeline/stepper. This structure mirrors the progressive learning path of the source document, making it intuitive for users. Each of the five phases is a collapsible card to prevent information overload and allow users to focus. A sticky top-navigation enables quick access to any phase, enhancing usability. This design transforms the static text into an engaging, self-paced learning dashboard. -->
+    <!-- Visualization & Content Choices: The source report is a text-based roadmap with no quantitative data, so no charts are used. Instead, each phase is represented by an interactive card. To enhance understanding, each card includes a small, abstract visual element created with HTML/CSS or a simple Canvas script that thematically represents the phase's core concept (e.g., a gradient for Phase 1, a CSS circle for Phase 2, a canvas noise pattern for Phase 3). These visuals provide immediate context without the complexity of a full GLSL implementation. Key concepts and projects are presented in clean, readable text blocks within each card. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .phase-card-header {
+            transition: background-color 0.3s ease-in-out;
+        }
+        .phase-card-content {
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+            overflow: hidden;
+        }
+        .phase-icon-gradient {
+            background: linear-gradient(90deg, #a5b4fc, #fda4af);
+            animation: gradient-flow 5s ease infinite;
+            background-size: 200% 200%;
+        }
+        @keyframes gradient-flow {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+        .phase-icon-shape {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #7c3aed;
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+            animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        .css-3d-cube {
+            width: 48px;
+            height: 48px;
+            transform-style: preserve-3d;
+            transform: rotateX(-35deg) rotateY(-45deg);
+            animation: rotate-cube 8s infinite linear;
+        }
+        .cube-face {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            background: rgba(139, 92, 246, 0.7);
+            border: 1px solid #c4b5fd;
+        }
+        .front  { transform: rotateY(0deg) translateZ(24px); }
+        .back   { transform: rotateY(180deg) translateZ(24px); }
+        .right  { transform: rotateY(90deg) translateZ(24px); }
+        .left   { transform: rotateY(-90deg) translateZ(24px); }
+        .top    { transform: rotateX(90deg) translateZ(24px); }
+        .bottom { transform: rotateX(-90deg) translateZ(24px); }
+
+        @keyframes rotate-cube {
+            from { transform: rotateX(-35deg) rotateY(-45deg) rotateZ(0deg); }
+            to { transform: rotateX(-35deg) rotateY(-45deg) rotateZ(360deg); }
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-20 border-b border-slate-200">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-slate-800">GLSL Learning Roadmap</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div id="nav-links" class="ml-10 flex items-baseline space-x-4">
+                        <a href="#phase-1" class="nav-link text-slate-600 hover:bg-slate-200 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Phase 1</a>
+                        <a href="#phase-2" class="nav-link text-slate-600 hover:bg-slate-200 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Phase 2</a>
+                        <a href="#phase-3" class="nav-link text-slate-600 hover:bg-slate-200 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Phase 3</a>
+                        <a href="#phase-4" class="nav-link text-slate-600 hover:bg-slate-200 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Phase 4</a>
+                        <a href="#phase-5" class="nav-link text-slate-600 hover:bg-slate-200 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Phase 5</a>
+                        <a href="#resources" class="nav-link text-slate-600 hover:bg-slate-200 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Resources</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-4xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-extrabold text-slate-900 sm:text-4xl">A Roadmap to Learning GLSL</h2>
+            <p class="mt-4 text-lg text-slate-600">An interactive guide to mastering the OpenGL Shading Language, from your first pixels to advanced 3D scenes.</p>
+        </div>
+
+        <div class="space-y-6">
+            <!-- Phase 1 -->
+            <div id="phase-1" class="phase-container bg-white rounded-xl shadow-sm overflow-hidden">
+                <button class="phase-card-header w-full flex items-center justify-between p-5 text-left hover:bg-slate-100 focus:outline-none">
+                    <div class="flex items-center space-x-5">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-lg phase-icon-gradient flex items-center justify-center">
+                             <span class="text-white font-bold text-xl">1</span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-800">Phase 1: Foundations & Your First Pixels</h3>
+                            <p class="text-slate-500 mt-1">Understanding the fundamentals and coloring your first screen.</p>
+                        </div>
+                    </div>
+                    <div class="arrow-icon transition-transform duration-300 transform rotate-0">
+                        <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+                <div class="phase-card-content max-h-0">
+                    <div class="p-6 border-t border-slate-200">
+                        <h4 class="text-md font-semibold text-slate-700 mb-3">Key Concepts</h4>
+                        <ul class="list-disc list-inside space-y-2 text-slate-600">
+                            <li><b>The Rendering Pipeline:</b> CPU sends data to GPU -> Vertex Shader processes vertices -> Fragment Shader colors pixels.</li>
+                            <li><b>What are Shaders?</b> Small programs running on the GPU for every vertex or pixel.</li>
+                            <li><b>GLSL Syntax Basics:</b> `main()`, `float`, `vec2`, `vec3`, `vec4`, and built-in variables.</li>
+                            <li><b>Uniforms:</b> Variables passed from CPU to shader, like `u_time` (animation) and `u_resolution` (screen size).</li>
+                            <li><b>Fragment Coordinates:</b> `gl_FragCoord` and normalizing it to a 0.0-1.0 range (uv).</li>
+                        </ul>
+                        <h4 class="text-md font-semibold text-slate-700 mt-6 mb-3">Your First Project: A Color Gradient</h4>
+                        <div class="prose prose-slate max-w-none text-slate-600">
+                            <ol>
+                                <li>Set up an environment like Shadertoy or GLSL Sandbox.</li>
+                                <li>Write a shader that outputs a single, solid color.</li>
+                                <li>Use normalized `uv` coordinates to create a color gradient.</li>
+                                <li>Introduce the `u_time` uniform to make colors pulsate or change.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 2 -->
+            <div id="phase-2" class="phase-container bg-white rounded-xl shadow-sm overflow-hidden">
+                <button class="phase-card-header w-full flex items-center justify-between p-5 text-left hover:bg-slate-100 focus:outline-none">
+                    <div class="flex items-center space-x-5">
+                         <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center">
+                            <div class="phase-icon-shape"></div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-800">Phase 2: Drawing and Manipulating 2D Shapes</h3>
+                            <p class="text-slate-500 mt-1">Using math to define regions, boundaries, and patterns.</p>
+                        </div>
+                    </div>
+                    <div class="arrow-icon transition-transform duration-300 transform rotate-0">
+                        <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+                 <div class="phase-card-content max-h-0">
+                    <div class="p-6 border-t border-slate-200">
+                        <h4 class="text-md font-semibold text-slate-700 mb-3">Key Concepts</h4>
+                        <ul class="list-disc list-inside space-y-2 text-slate-600">
+                            <li><b>Shaping Functions:</b> `step()`, `smoothstep()`, and `mix()` for hard/soft edges and blending.</li>
+                            <li><b>Signed Distance Functions (SDFs):</b> Calculating a point's distance from a shape's edge.</li>
+                            <li><b>2D Transformations:</b> Math for translating, rotating, and scaling your coordinate system.</li>
+                            <li><b>Procedural Patterns:</b> `sin()`, `cos()`, `mod()`, and `fract()` for repeating patterns.</li>
+                        </ul>
+                        <h4 class="text-md font-semibold text-slate-700 mt-6 mb-3">Project: An Animated Scene</h4>
+                        <div class="prose prose-slate max-w-none text-slate-600">
+                           <ol>
+                               <li>Use an SDF to draw a circle.</li>
+                               <li>Use `smoothstep()` for a soft, anti-aliased edge.</li>
+                               <li>Create a function to draw a rectangle for a background pattern.</li>
+                               <li>Animate the scene: make the circle pulsate and the background scroll.</li>
+                           </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 3 -->
+            <div id="phase-3" class="phase-container bg-white rounded-xl shadow-sm overflow-hidden">
+                <button class="phase-card-header w-full flex items-center justify-between p-5 text-left hover:bg-slate-100 focus:outline-none">
+                     <div class="flex items-center space-x-5">
+                         <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-slate-200 flex items-center justify-center">
+                            <canvas id="noise-canvas" width="48" height="48"></canvas>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-800">Phase 3: The Power of Noise</h3>
+                            <p class="text-slate-500 mt-1">Creating organic, natural-looking textures and movement.</p>
+                        </div>
+                    </div>
+                    <div class="arrow-icon transition-transform duration-300 transform rotate-0">
+                        <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+                 <div class="phase-card-content max-h-0">
+                    <div class="p-6 border-t border-slate-200">
+                        <h4 class="text-md font-semibold text-slate-700 mb-3">Key Concepts</h4>
+                        <ul class="list-disc list-inside space-y-2 text-slate-600">
+                            <li><b>Noise vs. Random:</b> Understanding pseudo-randomness on the GPU.</li>
+                            <li><b>Value/Perlin/Simplex Noise:</b> Algorithms for generating smooth, procedural gradients.</li>
+                            <li><b>Fractal Brownian Motion (fBm):</b> Layering noise to create rich, detailed textures.</li>
+                            <li><b>Domain Warping:</b> Using noise to distort coordinate space for effects like smoke and water.</li>
+                        </ul>
+                        <h4 class="text-md font-semibold text-slate-700 mt-6 mb-3">Project: A Procedural Landscape or Effect</h4>
+                        <div class="prose prose-slate max-w-none text-slate-600">
+                           <ol>
+                               <li>Implement fBM to create a cloud or marble texture.</li>
+                               <li>Use domain warping to make the texture flow and distort.</li>
+                               <li>Combine SDFs and noise to create a rough, planet-like circle.</li>
+                           </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 4 -->
+            <div id="phase-4" class="phase-container bg-white rounded-xl shadow-sm overflow-hidden">
+                <button class="phase-card-header w-full flex items-center justify-between p-5 text-left hover:bg-slate-100 focus:outline-none">
+                     <div class="flex items-center space-x-5">
+                         <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center">
+                            <div class="css-3d-cube">
+                                <div class="cube-face front"></div><div class="cube-face back"></div>
+                                <div class="cube-face right"></div><div class="cube-face left"></div>
+                                <div class="cube-face top"></div><div class="cube-face bottom"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-800">Phase 4: Entering the 3rd Dimension with Raymarching</h3>
+                            <p class="text-slate-500 mt-1">Rendering complex 3D scenes entirely within a fragment shader.</p>
+                        </div>
+                    </div>
+                    <div class="arrow-icon transition-transform duration-300 transform rotate-0">
+                        <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+                 <div class="phase-card-content max-h-0">
+                    <div class="p-6 border-t border-slate-200">
+                        <h4 class="text-md font-semibold text-slate-700 mb-3">Key Concepts</h4>
+                        <ul class="list-disc list-inside space-y-2 text-slate-600">
+                            <li><b>Raymarching & Sphere Tracing:</b> Marching a ray from a camera to render SDF-defined scenes.</li>
+                            <li><b>3D SDFs:</b> Extending 2D shapes to 3D for spheres, boxes, tori, etc.</li>
+                            <li><b>Calculating Normals:</b> Finding the surface direction for lighting.</li>
+                            <li><b>Basic Lighting:</b> Implementing simple models like diffuse (Lambertian) lighting.</li>
+                            <li><b>Simple Shadows:</b> Casting a ray from the surface towards the light source.</li>
+                        </ul>
+                        <h4 class="text-md font-semibold text-slate-700 mt-6 mb-3">Project: Your First 3D Scene</h4>
+                        <div class="prose prose-slate max-w-none text-slate-600">
+                           <ol>
+                               <li>Write a basic raymarching loop.</li>
+                               <li>Create a "scene" function defining SDFs for simple objects.</li>
+                               <li>Implement a function to calculate the normal.</li>
+                               <li>Add a simple light source and calculate diffuse lighting.</li>
+                               <li>Add soft shadows to the scene.</li>
+                           </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 5 -->
+            <div id="phase-5" class="phase-container bg-white rounded-xl shadow-sm overflow-hidden">
+                <button class="phase-card-header w-full flex items-center justify-between p-5 text-left hover:bg-slate-100 focus:outline-none">
+                     <div class="flex items-center space-x-5">
+                         <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center" style="background-image: radial-gradient(circle, #475569, #1e293b);">
+                             <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.293 2.293a1 1 0 010 1.414L10 16l-4 4m14-10l-2.293-2.293a1 1 0 00-1.414 0L12 10"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-800">Phase 5: Advanced Techniques & Integration</h3>
+                            <p class="text-slate-500 mt-1">Exploring advanced topics and using shaders in larger applications.</p>
+                        </div>
+                    </div>
+                    <div class="arrow-icon transition-transform duration-300 transform rotate-0">
+                        <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+                 <div class="phase-card-content max-h-0">
+                    <div class="p-6 border-t border-slate-200">
+                        <h4 class="text-md font-semibold text-slate-700 mb-3">Key Concepts</h4>
+                        <ul class="list-disc list-inside space-y-2 text-slate-600">
+                            <li><b>Vertex Shaders:</b> Transforming 3D model geometry in the traditional pipeline.</li>
+                            <li><b>Textures:</b> Reading from images (`sampler2D`) to apply textures.</li>
+                            <li><b>Post-Processing:</b> Applying effects like bloom, depth of field, and color grading.</li>
+                            <li><b>Physically Based Rendering (PBR):</b> Simulating real-world material properties.</li>
+                            <li><b>Integration:</b> Using custom shaders in frameworks like Three.js or engines like Godot/Unity.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources -->
+        <div id="resources" class="mt-16 pt-10 border-t border-slate-200">
+             <div class="text-center mb-10">
+                <h2 class="text-3xl font-extrabold text-slate-900">Essential Resources</h2>
+                <p class="mt-3 text-lg text-slate-600">Curated links to help you on your journey.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <a href="https://thebookofshaders.com/" target="_blank" rel="noopener noreferrer" class="resource-card block p-6 bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300">
+                    <h4 class="font-bold text-slate-800">The Book of Shaders</h4>
+                    <p class="text-slate-600 mt-2">The absolute best place to start. A gentle, interactive introduction to the fundamentals.</p>
+                </a>
+                <a href="https://www.shadertoy.com" target="_blank" rel="noopener noreferrer" class="resource-card block p-6 bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300">
+                    <h4 class="font-bold text-slate-800">Shadertoy</h4>
+                    <p class="text-slate-600 mt-2">An incredible library of shaders written by the best in the world. Read code and get inspired.</p>
+                </a>
+                <a href="https://iquilezles.org/articles/" target="_blank" rel="noopener noreferrer" class="resource-card block p-6 bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300">
+                    <h4 class="font-bold text-slate-800">Inigo Quilez's Articles</h4>
+                    <p class="text-slate-600 mt-2">The "godfather" of modern SDF-based graphics. His articles are pure gold but can be mathematically dense.</p>
+                </a>
+                <a href="https://learnopengl.com/" target="_blank" rel="noopener noreferrer" class="resource-card block p-6 bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300">
+                    <h4 class="font-bold text-slate-800">LearnOpenGL</h4>
+                    <p class="text-slate-600 mt-2">A fantastic, in-depth resource for learning the traditional OpenGL pipeline and how shaders work together.</p>
+                </a>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Accordion functionality
+            const phaseHeaders = document.querySelectorAll('.phase-card-header');
+            phaseHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const arrow = header.querySelector('.arrow-icon');
+                    
+                    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                        content.style.maxHeight = '0px';
+                        content.style.paddingTop = '0px';
+                        content.style.paddingBottom = '0px';
+                        arrow.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        content.style.paddingTop = '1.5rem';
+                        content.style.paddingBottom = '1.5rem';
+                        arrow.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // Auto-open first phase
+            if (phaseHeaders.length > 0) {
+                 setTimeout(() => {
+                    phaseHeaders[0].click();
+                }, 100);
+            }
+
+            // Simple noise canvas
+            const canvas = document.getElementById('noise-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                const imageData = ctx.createImageData(canvas.width, canvas.height);
+                const data = imageData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    const value = Math.floor(Math.random() * 255);
+                    data[i] = value;
+                    data[i + 1] = value;
+                    data[i + 2] = value;
+                    data[i + 3] = 255;
+                }
+                ctx.putImageData(imageData, 0, 0);
+            }
+
+            // Scrollspy for navigation
+            const sections = document.querySelectorAll('.phase-container, #resources');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('bg-slate-200', 'text-slate-900');
+                            const href = link.getAttribute('href');
+                            if (`#${entry.target.id}` === href) {
+                                link.classList.add('bg-slate-200', 'text-slate-900');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px", threshold: 0 });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
